@@ -1,15 +1,37 @@
 const express = require("express");
+const fs = require("node:fs");
 
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+let students = [];
+
+app.get("/api/students", (req, res) => {
+    res.json(students);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.post("/api/students", (req, res) => {
+    const student = {
+        id: Date.now(),
+        name: req.body.name,
+        email: req.body.email
+    };
+
+    students.push(student);
+
+    res.status(201).json(student);
+});
+
+app.delete("/api/students/:id", (req, res) => {
+    students = students.filter(
+        student => student.id !== Number(req.params.id)
+    );
+
+    res.json({ message: "Student deleted" });
+});
+
+app.listen(3000, () => {
+    console.log("Server running at http://localhost:3000");
 });
